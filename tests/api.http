@@ -1,11 +1,11 @@
-@token = TOKEN
+@baseUrl = https://simracing-api.onrender.com
+@token = TOKEN_HERE
 @userId = ID_HERE
 @teamId = TEAM_ID_HERE
 @raceId = RACE_ID_HERE
 
-
-
-POST http://localhost:3000/api/auth/register
+### REGISTER
+POST {{baseUrl}}/api/auth/register
 Content-Type: application/json
 
 {
@@ -15,7 +15,9 @@ Content-Type: application/json
 }
 
 ###
-POST http://localhost:3000/api/auth/login
+
+### LOGIN
+POST {{baseUrl}}/api/auth/login
 Content-Type: application/json
 
 {
@@ -24,41 +26,29 @@ Content-Type: application/json
 }
 
 ###
-GET http://localhost:3000/api/auth/me
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5YmM0MDQ0ZjdlZmM5YzU1OTliNmQ2ZiIsImlhdCI6MTc3Mzk0NDkwMywiZXhwIjoxNzczOTQ4NTAzfQ.zDlWbb1MEx7wobWPIt1cfon5SH2hJoDLuO6CuC80sgE
 
+### ME
+GET {{baseUrl}}/api/auth/me
+Authorization: Bearer {{token}}
 
-### 
+---
 
+### USERS
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-###CRUD operations for users
-### alle users
-GET http://localhost:3000/api/users
+### GET ALL
+GET {{baseUrl}}/api/users
 Authorization: Bearer {{token}}
 
 ###
 
-### user via id
-GET http://localhost:3000/api/users/{{userId}}
+### GET BY ID
+GET {{baseUrl}}/api/users/{{userId}}
 Authorization: Bearer {{token}}
 
 ###
 
-### user maken
-POST http://localhost:3000/api/users
+### CREATE
+POST {{baseUrl}}/api/users
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
@@ -70,8 +60,8 @@ Authorization: Bearer {{token}}
 
 ###
 
-### user updaten
-PUT http://localhost:3000/api/users/{{userId}}
+### UPDATE
+PUT {{baseUrl}}/api/users/{{userId}}
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
@@ -81,37 +71,22 @@ Authorization: Bearer {{token}}
 
 ###
 
-### user verwijderen
-DELETE http://localhost:3000/api/users/{{userId}}
+### DELETE
+DELETE {{baseUrl}}/api/users/{{userId}}
 Authorization: Bearer {{token}}
 
+---
 
+### TEAMS
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-###
-### TEAMS CRUD
-
-GET http://localhost:3000/api/teams
+### GET ALL
+GET {{baseUrl}}/api/teams
 Authorization: Bearer {{token}}
 
 ###
 
-POST http://localhost:3000/api/teams
+### CREATE
+POST {{baseUrl}}/api/teams
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
@@ -121,13 +96,15 @@ Authorization: Bearer {{token}}
 }
 
 ###
-###GET BY ID
-GET http://localhost:3000/api/teams/{{teamId}}
+
+### GET BY ID
+GET {{baseUrl}}/api/teams/{{teamId}}
 Authorization: Bearer {{token}}
 
 ###
-###UPDATE
-PUT http://localhost:3000/api/teams/{{teamId}}
+
+### UPDATE
+PUT {{baseUrl}}/api/teams/{{teamId}}
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
@@ -136,36 +113,23 @@ Authorization: Bearer {{token}}
 }
 
 ###
-###DELETE
-DELETE http://localhost:3000/api/teams/{{teamId}}
+
+### DELETE
+DELETE {{baseUrl}}/api/teams/{{teamId}}
 Authorization: Bearer {{token}}
 
+---
 
+### RACES
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-###
-### RACES CRUD
-
-GET http://localhost:3000/api/races
+### GET ALL
+GET {{baseUrl}}/api/races
 Authorization: Bearer {{token}}
 
 ###
-###CREATE
-POST http://localhost:3000/api/races
+
+### CREATE
+POST {{baseUrl}}/api/races
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
@@ -177,13 +141,15 @@ Authorization: Bearer {{token}}
 }
 
 ###
-###Get by ID
-GET http://localhost:3000/api/races/{{raceId}}
+
+### GET BY ID
+GET {{baseUrl}}/api/races/{{raceId}}
 Authorization: Bearer {{token}}
 
 ###
-###Update
-PUT http://localhost:3000/api/races/{{raceId}}
+
+### UPDATE
+PUT {{baseUrl}}/api/races/{{raceId}}
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
@@ -192,6 +158,7 @@ Authorization: Bearer {{token}}
 }
 
 ###
-###DELETE
-DELETE http://localhost:3000/api/races/{{raceId}}
+
+### DELETE
+DELETE {{baseUrl}}/api/races/{{raceId}}
 Authorization: Bearer {{token}}

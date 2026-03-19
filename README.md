@@ -53,3 +53,62 @@ Testing
 Alle API endpoints worden getest via een .http bestand met de REST Client extensie in Visual Studio Code.
 
 Requests worden gescheiden met ###.
+
+
+
+
+
+## Live API
+https://simracing-api.onrender.com
+
+## Test login
+POST /api/auth/login
+
+Body:
+{
+  "email": "admin@test.com",
+  "password": "123456"
+}
+
+## Endpoints
+
+### Auth
+POST /api/auth/register  
+POST /api/auth/login  
+GET /api/auth/me  
+
+---
+
+### Users
+GET /api/users  
+GET /api/users/:id  
+POST /api/users  
+PUT /api/users/:id  
+DELETE /api/users/:id  
+
+---
+
+### Teams
+GET /api/teams  
+GET /api/teams/:id  
+POST /api/teams  
+PUT /api/teams/:id  
+DELETE /api/teams/:id  
+
+---
+
+### Races
+GET /api/races  
+GET /api/races/:id  
+POST /api/races  
+PUT /api/races/:id  
+DELETE /api/races/:id  
+
+
+### Hoe testen
+
+1. Login via /api/auth/login
+2. Kopieer token
+3. Gebruik Authorization header:
+
+Authorization: Bearer TOKEN
