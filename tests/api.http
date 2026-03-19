@@ -1,6 +1,6 @@
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5YmM0MDQ0ZjdlZmM5YzU1OTliNmQ2ZiIsImlhdCI6MTc3Mzk0NDkwMywiZXhwIjoxNzczOTQ4NTAzfQ.zDlWbb1MEx7wobWPIt1cfon5SH2hJoDLuO6CuC80sgE
+@token = TOKEN
 @userId = ID_HERE
-@teamId = 69bbab3e30ccb6240ee2fafe
+@teamId = TEAM_ID_HERE
 @raceId = RACE_ID_HERE
 
 
