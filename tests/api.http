@@ -1,0 +1,197 @@
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5YmM0MDQ0ZjdlZmM5YzU1OTliNmQ2ZiIsImlhdCI6MTc3Mzk0NDkwMywiZXhwIjoxNzczOTQ4NTAzfQ.zDlWbb1MEx7wobWPIt1cfon5SH2hJoDLuO6CuC80sgE
+@userId = ID_HERE
+@teamId = 69bbab3e30ccb6240ee2fafe
+@raceId = RACE_ID_HERE
+
+
+
+POST http://localhost:3000/api/auth/register
+Content-Type: application/json
+
+{
+    "name": "Batiste",
+    "email": "batiste@email.com",
+    "password": "test123"
+}
+
+###
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+    "email": "batiste@email.com",
+    "password": "test123"
+}
+
+###
+GET http://localhost:3000/api/auth/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5YmM0MDQ0ZjdlZmM5YzU1OTliNmQ2ZiIsImlhdCI6MTc3Mzk0NDkwMywiZXhwIjoxNzczOTQ4NTAzfQ.zDlWbb1MEx7wobWPIt1cfon5SH2hJoDLuO6CuC80sgE
+
+
+### 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+###CRUD operations for users
+### alle users
+GET http://localhost:3000/api/users
+Authorization: Bearer {{token}}
+
+###
+
+### user via id
+GET http://localhost:3000/api/users/{{userId}}
+Authorization: Bearer {{token}}
+
+###
+
+### user maken
+POST http://localhost:3000/api/users
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+ "name": "Max Verstappen",
+ "email": "max@f1.com",
+ "password": "123456"
+}
+
+###
+
+### user updaten
+PUT http://localhost:3000/api/users/{{userId}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+ "name": "Updated name"
+}
+
+###
+
+### user verwijderen
+DELETE http://localhost:3000/api/users/{{userId}}
+Authorization: Bearer {{token}}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+###
+### TEAMS CRUD
+
+GET http://localhost:3000/api/teams
+Authorization: Bearer {{token}}
+
+###
+
+POST http://localhost:3000/api/teams
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+ "name": "Red Bull Racing",
+ "country": "Austria"
+}
+
+###
+###GET BY ID
+GET http://localhost:3000/api/teams/{{teamId}}
+Authorization: Bearer {{token}}
+
+###
+###UPDATE
+PUT http://localhost:3000/api/teams/{{teamId}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+ "name": "Updated Team"
+}
+
+###
+###DELETE
+DELETE http://localhost:3000/api/teams/{{teamId}}
+Authorization: Bearer {{token}}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+###
+### RACES CRUD
+
+GET http://localhost:3000/api/races
+Authorization: Bearer {{token}}
+
+###
+###CREATE
+POST http://localhost:3000/api/races
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+ "name": "Spa GP",
+ "track": "Spa-Francorchamps",
+ "date": "2026-04-01",
+ "team": "{{teamId}}"
+}
+
+###
+###Get by ID
+GET http://localhost:3000/api/races/{{raceId}}
+Authorization: Bearer {{token}}
+
+###
+###Update
+PUT http://localhost:3000/api/races/{{raceId}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+ "name": "Updated Race"
+}
+
+###
+###DELETE
+DELETE http://localhost:3000/api/races/{{raceId}}
+Authorization: Bearer {{token}}
