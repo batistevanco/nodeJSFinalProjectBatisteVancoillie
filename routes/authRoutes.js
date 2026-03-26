@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 const authMiddleware = require("../middleware/authMiddleware");
 const { registerValidation, loginValidation } = require("../validation/authValidation");
+const mongoose = require("mongoose");
 
 // tijdelijk test endpoint
 router.get("/test", (req, res) => {
