@@ -3,6 +3,7 @@ const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 const teamRoutes = require("./routes/teamRoutes");
 const raceRoutes = require("./routes/raceRoutes");
+const registrationRoutes = require("./routes/registrationRoutes");
 
 // dotenv laden zodat we environment variables kunnen gebruiken
 require("dotenv").config();
@@ -27,6 +28,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/teams", teamRoutes);
 app.use("/api/races", raceRoutes);
+app.use("/api/registrations", registrationRoutes);
 
 // Test route
 app.get("/", (req, res) => {

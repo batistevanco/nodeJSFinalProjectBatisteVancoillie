@@ -30,8 +30,19 @@ const raceValidation = (data) => {
     return schema.validate(data);
 };
 
+const registrationValidation = (data) => {
+    const schema = Joi.object({
+        user: Joi.string().required(),
+        race: Joi.string().required(),
+        position: Joi.number().optional()
+    });
+
+    return schema.validate(data);
+};
+
 module.exports = {
     userValidation,
     teamValidation,
-    raceValidation
+    raceValidation,
+    registrationValidation
 };

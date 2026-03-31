@@ -3,6 +3,7 @@
 @userId = ID_HERE
 @teamId = TEAM_ID_HERE
 @raceId = RACE_ID_HERE
+@registrationId = REGISTRATION_ID_HERE
 
 ### REGISTER
 POST {{baseUrl}}/api/auth/register
@@ -162,3 +163,35 @@ Authorization: Bearer {{token}}
 ### DELETE
 DELETE {{baseUrl}}/api/races/{{raceId}}
 Authorization: Bearer {{token}}
+
+
+
+
+###
+
+
+### REGISTRATION CREATE
+POST https://simracing-api.onrender.com/api/registrations
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "user": "{{userId}}",
+  "race": "{{raceId}}",
+  "position": 1
+}
+
+### GET registration by ID
+GET /api/registrations/{{registrationId}}
+Authorization: Bearer {{token}}
+
+###
+
+### UPDATE registration
+PUT /api/registrations/{{registrationId}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "position": 2
+}
