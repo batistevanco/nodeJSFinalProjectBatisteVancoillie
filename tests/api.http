@@ -1,18 +1,24 @@
+
 @baseUrl = https://simracing-api.onrender.com
 @token = TOKEN_HERE
-@userId = ID_HERE
+@userId = USER_ID_HERE
 @teamId = TEAM_ID_HERE
 @raceId = RACE_ID_HERE
 @registrationId = REGISTRATION_ID_HERE
+
+### ROOT
+GET {{baseUrl}}/
+
+###
 
 ### REGISTER
 POST {{baseUrl}}/api/auth/register
 Content-Type: application/json
 
 {
-    "name": "Batiste",
-    "email": "batiste@email.com",
-    "password": "test123"
+  "name": "Batiste",
+  "email": "batiste@email.com",
+  "password": "test123"
 }
 
 ###
@@ -22,8 +28,8 @@ POST {{baseUrl}}/api/auth/login
 Content-Type: application/json
 
 {
-    "email": "batiste@email.com",
-    "password": "test123"
+  "email": "batiste@email.com",
+  "password": "test123"
 }
 
 ###
@@ -32,146 +38,149 @@ Content-Type: application/json
 GET {{baseUrl}}/api/auth/me
 Authorization: Bearer {{token}}
 
----
+###
 
-### USERS
-
-### GET ALL
+### USERS - GET ALL
 GET {{baseUrl}}/api/users
 Authorization: Bearer {{token}}
 
 ###
 
-### GET BY ID
+### USERS - GET BY ID
 GET {{baseUrl}}/api/users/{{userId}}
 Authorization: Bearer {{token}}
 
 ###
 
-### CREATE
+### USERS - CREATE
 POST {{baseUrl}}/api/users
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
- "name": "Max Verstappen",
- "email": "max@f1.com",
- "password": "123456"
+  "name": "Admin User",
+  "email": "admin@test.com",
+  "password": "123456",
+  "role": "admin"
 }
 
 ###
 
-### UPDATE
+### USERS - UPDATE
 PUT {{baseUrl}}/api/users/{{userId}}
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
- "name": "Updated name"
+  "name": "Updated User"
 }
 
 ###
 
-### DELETE
+### USERS - DELETE
 DELETE {{baseUrl}}/api/users/{{userId}}
 Authorization: Bearer {{token}}
 
----
+###
 
-### TEAMS
-
-### GET ALL
+### TEAMS - GET ALL
 GET {{baseUrl}}/api/teams
 Authorization: Bearer {{token}}
 
 ###
 
-### CREATE
-POST {{baseUrl}}/api/teams
-Content-Type: application/json
-Authorization: Bearer {{token}}
-
-{
- "name": "Red Bull Racing",
- "country": "Austria"
-}
-
-###
-
-### GET BY ID
+### TEAMS - GET BY ID
 GET {{baseUrl}}/api/teams/{{teamId}}
 Authorization: Bearer {{token}}
 
 ###
 
-### UPDATE
+### TEAMS - CREATE
+POST {{baseUrl}}/api/teams
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Red Bull Racing",
+  "country": "Austria"
+}
+
+###
+
+### TEAMS - UPDATE
 PUT {{baseUrl}}/api/teams/{{teamId}}
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
- "name": "Updated Team"
+  "name": "Updated Team"
 }
 
 ###
 
-### DELETE
+### TEAMS - DELETE
 DELETE {{baseUrl}}/api/teams/{{teamId}}
 Authorization: Bearer {{token}}
 
----
+###
 
-### RACES
-
-### GET ALL
+### RACES - GET ALL
 GET {{baseUrl}}/api/races
 Authorization: Bearer {{token}}
 
 ###
 
-### CREATE
-POST {{baseUrl}}/api/races
-Content-Type: application/json
-Authorization: Bearer {{token}}
-
-{
- "name": "Spa GP",
- "track": "Spa-Francorchamps",
- "date": "2026-04-01",
- "team": "{{teamId}}"
-}
-
-###
-
-### GET BY ID
+### RACES - GET BY ID
 GET {{baseUrl}}/api/races/{{raceId}}
 Authorization: Bearer {{token}}
 
 ###
 
-### UPDATE
+### RACES - CREATE
+POST {{baseUrl}}/api/races
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Spa GP",
+  "track": "Spa-Francorchamps",
+  "date": "2026-04-01",
+  "team": "{{teamId}}"
+}
+
+###
+
+### RACES - UPDATE
 PUT {{baseUrl}}/api/races/{{raceId}}
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
- "name": "Updated Race"
+  "name": "Updated Race"
 }
 
 ###
 
-### DELETE
+### RACES - DELETE
 DELETE {{baseUrl}}/api/races/{{raceId}}
 Authorization: Bearer {{token}}
 
+###
 
-
+### REGISTRATIONS - GET ALL
+GET {{baseUrl}}/api/registrations
+Authorization: Bearer {{token}}
 
 ###
 
+### REGISTRATIONS - GET BY ID
+GET {{baseUrl}}/api/registrations/{{registrationId}}
+Authorization: Bearer {{token}}
 
-### REGISTRATION CREATE
-POST https://simracing-api.onrender.com/api/registrations
+###
+
+### REGISTRATIONS - CREATE
+POST {{baseUrl}}/api/registrations
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
@@ -181,17 +190,19 @@ Authorization: Bearer {{token}}
   "position": 1
 }
 
-### GET registration by ID
-GET /api/registrations/{{registrationId}}
-Authorization: Bearer {{token}}
-
 ###
 
-### UPDATE registration
-PUT /api/registrations/{{registrationId}}
+### REGISTRATIONS - UPDATE
+PUT {{baseUrl}}/api/registrations/{{registrationId}}
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
   "position": 2
 }
+
+###
+
+### REGISTRATIONS - DELETE
+DELETE {{baseUrl}}/api/registrations/{{registrationId}}
+Authorization: Bearer {{token}}

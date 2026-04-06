@@ -4,10 +4,13 @@ const Registration = require("../models/registration");
 const authMiddleware = require("../middleware/authMiddleware");
 const mongoose = require("mongoose");
 
-const { registrationValidation } = require("../validation/generalValidation");
+const {
+    registrationValidation,
+    registrationUpdateValidation
+} = require("../validation/generalValidation");
 
 // alle registraties ophalen
-router.get("/", authMiddleware, async (req, res) => {
+router.get("/", authMiddleware, async (req, res, next) => {
     try {
         const registrations = await Registration.find()
             .populate("user", "-password")
@@ -15,12 +18,12 @@ router.get("/", authMiddleware, async (req, res) => {
 
         res.json(registrations);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        next(error);
     }
 });
 
 // registratie maken
-router.post("/", authMiddleware, async (req, res) => {
+router.post("/", authMiddleware, async (req, res, next) => {
     try {
         // validatie
         const { error } = registrationValidation(req.body);
@@ -43,27 +46,11 @@ router.post("/", authMiddleware, async (req, res) => {
         res.status(201).json(registration);
 
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        next(error);
     }
 });
 
-// registratie verwijderen
-router.delete("/:id", authMiddleware, async (req, res) => {
-    try {
-        if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-            return res.status(400).json({ message: "Invalid registration ID" });
-        }
-
-        await Registration.findByIdAndDelete(req.params.id);
-
-        res.json({ message: "Registration deleted" });
-
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-});
-
-router.get("/:id", authMiddleware, async (req, res) => {
+router.get("/:id", authMiddleware, async (req, res, next) => {
     try {
         if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
             return res.status(400).json({ message: "Invalid registration ID" });
@@ -80,26 +67,62 @@ router.get("/:id", authMiddleware, async (req, res) => {
         res.json(registration);
 
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        next(error);
     }
 });
 
-router.put("/:id", authMiddleware, async (req, res) => {
+router.put("/:id", authMiddleware, async (req, res, next) => {
     try {
         if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
             return res.status(400).json({ message: "Invalid registration ID" });
         }
 
-        const updated = await Registration.findByIdAndUpdate(
+        const { error } = registrationUpdateValidation(req.body);
+        if (error) {
+            return res.status(400).json({ message: error.details[0].message });
+        }
+
+        if (req.body.user && !mongoose.Types.ObjectId.isValid(req.body.user)) {
+            return res.status(400).json({ message: "Invalid user ID" });
+        }
+
+        if (req.body.race && !mongoose.Types.ObjectId.isValid(req.body.race)) {
+            return res.status(400).json({ message: "Invalid race ID" });
+        }
+
+        const updatedRegistration = await Registration.findByIdAndUpdate(
             req.params.id,
             req.body,
-            { new: true }
+            { new: true, runValidators: true }
         );
 
-        res.json(updated);
+        if (!updatedRegistration) {
+            return res.status(404).json({ message: "Registration not found" });
+        }
+
+        res.json(updatedRegistration);
 
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        next(error);
+    }
+});
+
+router.delete("/:id", authMiddleware, async (req, res, next) => {
+    try {
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+            return res.status(400).json({ message: "Invalid registration ID" });
+        }
+
+        const deletedRegistration = await Registration.findByIdAndDelete(req.params.id);
+
+        if (!deletedRegistration) {
+            return res.status(404).json({ message: "Registration not found" });
+        }
+
+        res.json({ message: "Registration deleted" });
+
+    } catch (error) {
+        next(error);
     }
 });
 

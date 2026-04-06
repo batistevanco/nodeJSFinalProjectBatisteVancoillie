@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <base href="http://localhost:52288/d7eb44cf-662e-48cd-9fbc-b00f5841e583/" />
+  <title>03-third-party-middleware.md</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  	<link href="bundled/default-markdown.css" rel="stylesheet" />
+	<link href="bundled/katex.css" rel="stylesheet" />
+	<link href="bundled/colour-scheme.css" rel="stylesheet" />
+	<link href="bundled/settings.css" rel="stylesheet" />
+  	<script src="bundled/smiles-drawer.min.js" type="application/javascript"></script>
+
+  <script type="application/javascript">
+    function printAndClose(enabled) {
+      if (typeof SmiDrawer === "function") {
+        const svgs = document.querySelectorAll('svg[data-smiles]');
+        svgs.forEach(function(svg) {
+          var smiles = svg.getAttribute('data-smiles');
+          const configJson = svg.getAttribute('data-smiles-config');
+          let moleculeOptions;
+          let reactionOptions;
+          if (configJson) {
+            try {
+              // decodeURIComponent to match encodeURIComponent in processMarkdown.ts
+              var parsedConfig = JSON.parse(decodeURIComponent(configJson));
+              moleculeOptions = parsedConfig.moleculeOptions ?? {};
+              reactionOptions = parsedConfig.reactionOptions ?? {};
+            } catch (e) {
+              // ignore, fallback to empty options
+            }
+          }
+          var parent = svg.parentNode;
+          var errorDiv = document.createElement('div');
+          errorDiv.style.color = 'red';
+          errorDiv.style.fontFamily = 'monospace';
+          errorDiv.style.background = '#fff0f0';
+          errorDiv.style.border = '1px solid #f88';
+          errorDiv.style.padding = '0.5em 1em';
+          errorDiv.style.margin = '0.5em 0';
+          function showError(msg) {
+            if (parent) {
+              var pre = document.createElement('pre');
+              pre.textContent = msg;
+              errorDiv.appendChild(pre);
+              parent.replaceChild(errorDiv, svg);
+            }
+          }
+          try {
+            var drawer = new SmiDrawer(moleculeOptions, reactionOptions);
+            SmilesDrawer.parse(smiles, function(tree) {
+              drawer.draw(smiles, svg);
+            }, function(err) {
+              showError('Invalid SMILES: ' + smiles + (err ? '\n' + err : ''));
+            });
+          } catch (err) {
+            showError('Invalid SMILES: ' + smiles + (err ? '\n' + err : ''));
+          }
+        });
+      }
+      if (enabled) {
+        window.addEventListener("afterprint", (event) => {
+          fetch("completed").then(window.close);
+        });
+        setTimeout(window.print, 500);
+      }
+    }
+    function listenForUpdates() {
+      const ws = new WebSocket(`ws://localhost:${window.location.port}`);
+      ws.onopen = function () {
+        const sessionId = window.location.pathname.split("/")[1];
+        ws.send(JSON.stringify({ sessionId: sessionId }));
+      };
+      ws.onmessage = function (event) {
+        const message = JSON.parse(event.data);
+        if (message.type === 'refreshPreview') {
+          const scrollOffset = window.scrollY;
+          ws.send(JSON.stringify({ type: 'scrollOffset', value: scrollOffset }));
+          location.reload();
+        } else if (message.type === 'restoreScroll') {
+          const setScrollPosition = () => {
+            window.scrollTo(0, message.scrollOffset);
+          };
+          if (document.readyState === 'complete') {
+            setScrollPosition();
+          } else {
+            window.addEventListener('load', setScrollPosition);
+            const images = document.querySelectorAll('img');
+            let loadedImages = 0;
+            images.forEach(img => {
+              if (img.complete) {
+                loadedImages++;
+              } else {
+                img.addEventListener('load', () => {
+                  loadedImages++;
+                  if (loadedImages === images.length) {
+                    setScrollPosition();
+                  }
+                });
+              }
+            });
+          }
+        }
+      };
+
+      document.querySelectorAll('[data-source-map]')
+        .forEach(element => {
+          element.addEventListener('click', () => document.querySelector('.xref-highlight')?.classList.remove('xref-highlight'));
+          element.addEventListener('dblclick', () => {
+            const text = element.getAttribute('data-source-map');
+            ws.send(JSON.stringify({ type: 'findInEditor', value: text }));
+            element.classList.add('xref-highlight');
+          });
+        });
+    };
+  </script>
+</head>
+
+<body onload="listenForUpdates();printAndClose(false);">
+  <h3 class="filepath">05-Middleware/03-third-party-middleware.md</h3>
+  <div>
+    <h1 data-source-map="IyDwn5uh77iPIFRoaXJkLXBhcnR5IE1pZGRsZXdhcmUKCg==">🛡️ Third-party Middleware</h1>
+<h2 data-source-map="IyMg8J+OryBVc2luZyBucG0gTWlkZGxld2FyZSBQYWNrYWdlcwoK">🎯 Using npm Middleware Packages</h2>
+<div data-source-map="innerHTML"><div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; border-radius: 15px; color: white; text-align: center;">
+
+</div><h3 data-source-map="IyMjIEV4dGVuZCBFeHByZXNzIEZ1bmN0aW9uYWxpdHkKCg==">Extend Express Functionality</h3>
+<p data-source-map="aGVsbWV0LCBtb3JnYW4sIGFuZCBtb3JlIQ==">helmet, morgan, and more!</p>
+<div data-source-map="innerHTML"></div>
+
+</div><hr>
+<h2 data-source-map="IyMg8J+TmiBUaGlyZC1wYXJ0eSBNaWRkbGV3YXJlCgo=">📚 Third-party Middleware</h2>
+<div data-source-map="innerHTML"><div style="background-color: #e3f2fd; padding: 25px; border-radius: 10px; color: #1a1a1a;">
+
+</div><h3 data-source-map="IyMjIFdoYXQgaXMgVGhpcmQtcGFydHkgTWlkZGxld2FyZT8KCg==">What is Third-party Middleware?</h3>
+<p data-source-map="bnBtIHBhY2thZ2VzIHRoYXQgcHJvdmlkZSBtaWRkbGV3YXJlIGZ1bmN0aW9uYWxpdHk6">npm packages that provide middleware functionality:</p>
+<p data-source-map="8J+UlyAqKk9mZmljaWFsIGxpc3Q6KiogW2V4cHJlc3Nqcy5jb20vZW4vcmVzb3VyY2VzL21pZGRsZXdhcmUuaHRtbF0oaHR0cHM6Ly9leHByZXNzanMuY29tL2VuL3Jlc291cmNlcy9taWRkbGV3YXJlLmh0bWwp">🔗 <strong>Official list:</strong> <a href="https://expressjs.com/en/resources/middleware.html">expressjs.com/en/resources/middleware.html</a></p>
+<h3 data-source-map="IyMjIFBvcHVsYXIgRXhhbXBsZXMKCg==">Popular Examples</h3>
+<ul>
+<li data-source-map="LSDwn5uh77iPICoqaGVsbWV0KiogLSBTZWN1cml0eSBoZWFkZXJzCg==">🛡️ <strong>helmet</strong> - Security headers</li>
+<li data-source-map="LSDwn5OKICoqbW9yZ2FuKiogLSBIVFRQIHJlcXVlc3QgbG9nZ2VyCg==">📊 <strong>morgan</strong> - HTTP request logger</li>
+<li data-source-map="LSDwn42qICoqY29va2llLXBhcnNlcioqIC0gUGFyc2UgY29va2llcwo=">🍪 <strong>cookie-parser</strong> - Parse cookies</li>
+<li data-source-map="LSDwn5OkICoqbXVsdGVyKiogLSBIYW5kbGUgZmlsZSB1cGxvYWRzCg==">📤 <strong>multer</strong> - Handle file uploads</li>
+<li data-source-map="LSDwn5SQICoqY29ycyoqIC0gRW5hYmxlIENPUlMK">🔐 <strong>cors</strong> - Enable CORS</li>
+<li data-source-map="LSDwn5ec77iPICoqY29tcHJlc3Npb24qKiAtIEd6aXAgY29tcHJlc3Npb24=">🗜️ <strong>compression</strong> - Gzip compression</li>
+</ul>
+<div data-source-map="innerHTML"></div>
+
+</div><hr>
+<h2 data-source-map="IyMg4pqg77iPIFBlcmZvcm1hbmNlIENvbnNpZGVyYXRpb24KCg==">⚠️ Performance Consideration</h2>
+<div data-source-map="innerHTML"><div style="background-color: #fff3e0; padding: 25px; border-radius: 10px; border-left: 5px solid #ff9800; color: #1a1a1a;">
+
+</div><h3 data-source-map="IyMjIFVzZSBPbmx5IFdoYXQgWW91IE5lZWQhCgo=">Use Only What You Need!</h3>
+<p data-source-map="RWFjaCBtaWRkbGV3YXJlIGFkZHMgb3ZlcmhlYWQgdG8gdGhlIHJlcXVlc3QgcGlwZWxpbmU6">Each middleware adds overhead to the request pipeline:</p>
+<pre data-source-map="YGBgClJlcXVlc3Qg4oaSIE1XMSDihpIgTVcyIOKGkiBNVzMg4oaSIE1XNCDihpIgTVc1IOKGkiBSb3V0ZSDihpIgUmVzcG9uc2UKYGBg"><code>Request → MW1 → MW2 → MW3 → MW4 → MW5 → Route → Response</code></pre>
+<p data-source-map="KipJbXBhY3Q6KioK"><strong>Impact:</strong></p>
+<ul>
+<li data-source-map="LSBNb3JlIG1pZGRsZXdhcmUgPSBTbG93ZXIgcmVzcG9uc2VzCg==">More middleware = Slower responses</li>
+<li data-source-map="LSBFYWNoIG1pZGRsZXdhcmUgdGFrZXMgdGltZSB0byBleGVjdXRlCg==">Each middleware takes time to execute</li>
+<li data-source-map="LSBPbmx5IGluc3RhbGwgd2hhdCdzIG5lY2Vzc2FyeQ==">Only install what&#39;s necessary</li>
+</ul>
+<h3 data-source-map="IyMjIEJlc3QgUHJhY3RpY2UKCg==">Best Practice</h3>
+<p data-source-map="4pyFIEluc3RhbGwgbWlkZGxld2FyZSBmb3Igc3BlY2lmaWMgbmVlZHMgIArinYwgRG9uJ3QgaW5zdGFsbCAianVzdCBpbiBjYXNlIg==">✅ Install middleware for specific needs<br>❌ Don&#39;t install &quot;just in case&quot;</p>
+<div data-source-map="innerHTML"></div>
+
+</div><hr>
+<h2 data-source-map="IyMg8J+boe+4jyBoZWxtZXQKCg==">🛡️ helmet</h2>
+<div data-source-map="innerHTML"><div style="background-color: #e8f5e9; padding: 25px; border-radius: 10px; color: #1a1a1a;">
+
+</div><h3 data-source-map="IyMjIFNlY3VyZSBZb3VyIEFwcAoK">Secure Your App</h3>
+<p data-source-map="aGVsbWV0IGhlbHBzIHNlY3VyZSBFeHByZXNzIGFwcHMgYnkgc2V0dGluZyB2YXJpb3VzIEhUVFAgaGVhZGVycy4=">helmet helps secure Express apps by setting various HTTP headers.</p>
+<h3 data-source-map="IyMjIEluc3RhbGxhdGlvbgoK">Installation</h3>
+<pre class="code-box">
+<code class="hljs">
+npm i helmet
+</code>
+</pre>
+<h3 data-source-map="IyMjIFVzYWdlCgo=">Usage</h3>
+<pre class="code-box">
+<code class="hljs">
+<span class="hljs-keyword">const</span> express = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;express&#x27;</span>);
+<span class="hljs-keyword">const</span> helmet = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;helmet&#x27;</span>);
+<span class="hljs-keyword">const</span> app = <span class="hljs-title function_">express</span>();
+
+<span class="hljs-comment">// Apply helmet middleware</span>
+app.<span class="hljs-title function_">use</span>(<span class="hljs-title function_">helmet</span>());
+
+app.<span class="hljs-title function_">get</span>(<span class="hljs-string">&#x27;/&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">req, res</span>) =&gt;</span> {
+    res.<span class="hljs-title function_">send</span>(<span class="hljs-string">&#x27;Hello World&#x27;</span>);
+});
+
+app.<span class="hljs-title function_">listen</span>(<span class="hljs-number">3000</span>);
+</code>
+</pre>
+<h3 data-source-map="IyMjIFdoYXQgaGVsbWV0IERvZXMKCg==">What helmet Does</h3>
+<p data-source-map="U2V0cyBzZWN1cml0eS1yZWxhdGVkIEhUVFAgaGVhZGVyczoK">Sets security-related HTTP headers:</p>
+<ul>
+<li data-source-map="LSBgWC1Db250ZW50LVR5cGUtT3B0aW9uc2AK"><code>X-Content-Type-Options</code></li>
+<li data-source-map="LSBgWC1GcmFtZS1PcHRpb25zYAo="><code>X-Frame-Options</code></li>
+<li data-source-map="LSBgU3RyaWN0LVRyYW5zcG9ydC1TZWN1cml0eWAK"><code>Strict-Transport-Security</code></li>
+<li data-source-map="LSBgWC1YU1MtUHJvdGVjdGlvbmAK"><code>X-XSS-Protection</code></li>
+<li data-source-map="LSBBbmQgbW9yZS4uLg==">And more...</li>
+</ul>
+<div data-source-map="innerHTML"></div>
+
+</div><hr>
+<h2 data-source-map="IyMg8J+TiiBtb3JnYW4gLSBIVFRQIFJlcXVlc3QgTG9nZ2VyCgo=">📊 morgan - HTTP Request Logger</h2>
+<div data-source-map="innerHTML"><div style="background-color: #f5f5f5; padding: 25px; border-radius: 10px; color: #1a1a1a;">
+
+</div><h3 data-source-map="IyMjIExvZyBFdmVyeSBSZXF1ZXN0Cgo=">Log Every Request</h3>
+<p data-source-map="bW9yZ2FuIGxvZ3MgSFRUUCByZXF1ZXN0cyBhdXRvbWF0aWNhbGx5Lg==">morgan logs HTTP requests automatically.</p>
+<p data-source-map="8J+UlyAqKkRvY3M6KiogW2dpdGh1Yi5jb20vZXhwcmVzc2pzL21vcmdhbl0oaHR0cHM6Ly9naXRodWIuY29tL2V4cHJlc3Nqcy9tb3JnYW4p">🔗 <strong>Docs:</strong> <a href="https://github.com/expressjs/morgan">github.com/expressjs/morgan</a></p>
+<h3 data-source-map="IyMjIEluc3RhbGxhdGlvbgoK">Installation</h3>
+<pre class="code-box">
+<code class="hljs">
+npm i morgan
+</code>
+</pre>
+<h3 data-source-map="IyMjIFVzYWdlCgo=">Usage</h3>
+<pre class="code-box">
+<code class="hljs">
+<span class="hljs-keyword">const</span> express = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;express&#x27;</span>);
+<span class="hljs-keyword">const</span> morgan = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;morgan&#x27;</span>);
+<span class="hljs-keyword">const</span> app = <span class="hljs-title function_">express</span>();
+
+<span class="hljs-comment">// Use &#x27;tiny&#x27; format</span>
+app.<span class="hljs-title function_">use</span>(<span class="hljs-title function_">morgan</span>(<span class="hljs-string">&#x27;tiny&#x27;</span>));
+
+app.<span class="hljs-title function_">get</span>(<span class="hljs-string">&#x27;/api/courses&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">req, res</span>) =&gt;</span> {
+    res.<span class="hljs-title function_">send</span>([<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>]);
+});
+
+app.<span class="hljs-title function_">listen</span>(<span class="hljs-number">3000</span>);
+</code>
+</pre>
+<div data-source-map="innerHTML"></div>
+
+</div><hr>
+<h2 data-source-map="IyMg8J+OqCBtb3JnYW4gT3V0cHV0IEZvcm1hdHMKCg==">🎨 morgan Output Formats</h2>
+<div data-source-map="innerHTML"><div style="background-color: #e3f2fd; padding: 25px; border-radius: 10px; color: #1a1a1a;">
+
+</div><h3 data-source-map="IyMjIEF2YWlsYWJsZSBGb3JtYXRzCgo=">Available Formats</h3>
+<pre class="code-box">
+<code class="hljs">
+<span class="hljs-comment">// Minimal output</span>
+app.<span class="hljs-title function_">use</span>(<span class="hljs-title function_">morgan</span>(<span class="hljs-string">&#x27;tiny&#x27;</span>));
+
+<span class="hljs-comment">// Standard Apache combined log output</span>
+app.<span class="hljs-title function_">use</span>(<span class="hljs-title function_">morgan</span>(<span class="hljs-string">&#x27;combined&#x27;</span>));
+
+<span class="hljs-comment">// Detailed</span>
+app.<span class="hljs-title function_">use</span>(<span class="hljs-title function_">morgan</span>(<span class="hljs-string">&#x27;dev&#x27;</span>));
+
+<span class="hljs-comment">// Common format</span>
+app.<span class="hljs-title function_">use</span>(<span class="hljs-title function_">morgan</span>(<span class="hljs-string">&#x27;common&#x27;</span>));
+</code>
+</pre>
+<h3 data-source-map="IyMjIEV4YW1wbGUgT3V0cHV0ICh0aW55KQoK">Example Output (tiny)</h3>
+<pre class="code-box">
+<code class="hljs">
+[nodemon] starting `node index.js`
+Listening on port 3000...
+GET /api/courses 200 79 - 2.059 ms
+</code>
+</pre>
+<p data-source-map="KipGb3JtYXQ6KiogYE1FVEhPRCBVUkwgU1RBVFVTIFNJWkUgLSBUSU1FYA=="><strong>Format:</strong> <code>METHOD URL STATUS SIZE - TIME</code></p>
+<div data-source-map="innerHTML"></div>
+
+</div><hr>
+<h2 data-source-map="IyMg8J+UpyBDb21wbGV0ZSBFeGFtcGxlIHdpdGggVGhpcmQtcGFydHkgTWlkZGxld2FyZQoK">🔧 Complete Example with Third-party Middleware</h2>
+<div data-source-map="innerHTML"><div style="background-color: #fff3e0; padding: 25px; border-radius: 10px; color: #1a1a1a;">
+
+</div><h3 data-source-map="IyMjIGluZGV4LmpzCgo=">index.js</h3>
+<pre class="code-box">
+<code class="hljs">
+<span class="hljs-keyword">const</span> express = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;express&#x27;</span>);
+<span class="hljs-keyword">const</span> helmet = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;helmet&#x27;</span>);
+<span class="hljs-keyword">const</span> morgan = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;morgan&#x27;</span>);
+<span class="hljs-keyword">const</span> app = <span class="hljs-title function_">express</span>();
+
+<span class="hljs-comment">// Built-in middleware</span>
+app.<span class="hljs-title function_">use</span>(express.<span class="hljs-title function_">json</span>());
+
+<span class="hljs-comment">// Third-party middleware</span>
+app.<span class="hljs-title function_">use</span>(<span class="hljs-title function_">helmet</span>());  <span class="hljs-comment">// Security</span>
+app.<span class="hljs-title function_">use</span>(<span class="hljs-title function_">morgan</span>(<span class="hljs-string">&#x27;tiny&#x27;</span>));  <span class="hljs-comment">// Logging</span>
+
+<span class="hljs-comment">// Routes</span>
+app.<span class="hljs-title function_">get</span>(<span class="hljs-string">&#x27;/api/courses&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">req, res</span>) =&gt;</span> {
+    res.<span class="hljs-title function_">send</span>([
+        { <span class="hljs-attr">id</span>: <span class="hljs-number">1</span>, <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;course1&#x27;</span> },
+        { <span class="hljs-attr">id</span>: <span class="hljs-number">2</span>, <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;course2&#x27;</span> }
+    ]);
+});
+
+app.<span class="hljs-title function_">listen</span>(<span class="hljs-number">3000</span>, <span class="hljs-function">() =&gt;</span> {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Listening on port 3000...&#x27;</span>);
+});
+</code>
+</pre>
+<div data-source-map="innerHTML"></div>
+
+</div><hr>
+<h2 data-source-map="IyMg8J+SoSBCZXN0IFByYWN0aWNlcwoK">💡 Best Practices</h2>
+<div data-source-map="innerHTML"><div style="background-color: #e8f5e9; padding: 20px; border-radius: 10px; border-left: 5px solid #4caf50; color: #1a1a1a;">
+
+</div><h3 data-source-map="IyMjIFRoaXJkLXBhcnR5IE1pZGRsZXdhcmUgR3VpZGVsaW5lcwoK">Third-party Middleware Guidelines</h3>
+<p data-source-map="4pyFICoqRE86KiogVXNlIGhlbG1ldCBmb3IgcHJvZHVjdGlvbiBhcHBzICAK4pyFICoqRE86KiogVXNlIGxvZ2dpbmcgaW4gZGV2ZWxvcG1lbnQgIArinIUgKipETzoqKiBSZWFkIGRvY3VtZW50YXRpb24gYmVmb3JlIHVzaW5nICAK4pyFICoqRE86KiogQ2hlY2sgcGFja2FnZSBwb3B1bGFyaXR5IGFuZCBtYWludGVuYW5jZSAgCuKchSAqKkRPOioqIFVwZGF0ZSBwYWNrYWdlcyByZWd1bGFybHk=">✅ <strong>DO:</strong> Use helmet for production apps<br>✅ <strong>DO:</strong> Use logging in development<br>✅ <strong>DO:</strong> Read documentation before using<br>✅ <strong>DO:</strong> Check package popularity and maintenance<br>✅ <strong>DO:</strong> Update packages regularly</p>
+<p data-source-map="4p2MICoqRE9OJ1Q6KiogSW5zdGFsbCBtaWRkbGV3YXJlIHlvdSBkb24ndCBuZWVkICAK4p2MICoqRE9OJ1Q6KiogVXNlIHVubWFpbnRhaW5lZCBwYWNrYWdlcyAgCuKdjCAqKkRPTidUOioqIElnbm9yZSBwZXJmb3JtYW5jZSBpbXBhY3QgIArinYwgKipET04nVDoqKiBTa2lwIHNlY3VyaXR5IG1pZGRsZXdhcmU=">❌ <strong>DON&#39;T:</strong> Install middleware you don&#39;t need<br>❌ <strong>DON&#39;T:</strong> Use unmaintained packages<br>❌ <strong>DON&#39;T:</strong> Ignore performance impact<br>❌ <strong>DON&#39;T:</strong> Skip security middleware</p>
+<div data-source-map="innerHTML"></div>
+
+</div><hr>
+<div data-source-map="innerHTML"><div style="text-align: center; padding: 20px; color: #666;">
+
+</div><p data-source-map="W/Cfj6AgQ291cnNlIEhvbWVdKC4uL1JFQURNRS5tZCkgfCBb8J+TmCBDaGFwdGVyIDUgSG9tZV0oLi9SRUFETUUubWQp"><a href="../README.md">🏠 Course Home</a> | <a href="./README.md">📘 Chapter 5 Home</a></p>
+<p data-source-map="W+KGkCBQcmV2aW91czogQnVpbHQtaW4gTWlkZGxld2FyZV0oLi8wMi1idWlsdGluLW1pZGRsZXdhcmUubWQpIHwgW05leHQ6IEVudmlyb25tZW50cyAmIENvbmZpZyDihpJdKC4vMDQtZW52aXJvbm1lbnRzLWNvbmZpZy5tZCk="><a href="./02-builtin-middleware.md">← Previous: Built-in Middleware</a> | <a href="./04-environments-config.md">Next: Environments &amp; Config →</a></p>
+<div data-source-map="innerHTML"></div>
+</div><script src='bundled/smartquotes.js'></script><script>smartquotes();</script>
+  </div>
+</body>
+
+</html>

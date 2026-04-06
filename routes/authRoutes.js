@@ -5,7 +5,6 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 const authMiddleware = require("../middleware/authMiddleware");
 const { registerValidation, loginValidation } = require("../validation/authValidation");
-const mongoose = require("mongoose");
 
 // tijdelijk test endpoint
 router.get("/test", (req, res) => {
@@ -13,7 +12,7 @@ router.get("/test", (req, res) => {
 });
 
 // gebruiker registreren
-router.post("/register", async (req, res) => {
+router.post("/register", async (req, res, next) => {
     // input validatie
     const { error } = registerValidation(req.body);
     if (error) {
@@ -47,12 +46,12 @@ router.post("/register", async (req, res) => {
         });
 
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        next(error);
     }
 });
 
 // gebruiker inloggen
-router.post("/login", async (req, res) => {
+router.post("/login", async (req, res, next) => {
     // input validatie
     const { error } = loginValidation(req.body);
     if (error) {
@@ -77,7 +76,7 @@ router.post("/login", async (req, res) => {
 
         // JWT token maken
         const token = jwt.sign(
-            { id: user._id },
+            { id: user._id, role: user.role },
             process.env.JWT_SECRET,
             { expiresIn: "1h" }
         );
@@ -88,15 +87,19 @@ router.post("/login", async (req, res) => {
         });
 
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        next(error);
     }
 });
 
 
 // Protected route - alleen toegankelijk met geldige JWT
-router.get("/me", authMiddleware, async (req, res) => {
+router.get("/me", authMiddleware, async (req, res, next) => {
     try {
         const user = await User.findById(req.user.id).select("-password");
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
 
         res.json({
             message: "Protected user data",
@@ -104,7 +107,7 @@ router.get("/me", authMiddleware, async (req, res) => {
         });
 
     } catch (error) {
-        res.status(500).json({ message: "Server error" });
+        next(error);
     }
 });
 

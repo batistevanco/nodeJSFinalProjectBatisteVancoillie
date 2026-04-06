@@ -4,8 +4,20 @@ const userValidation = (data) => {
     const schema = Joi.object({
         name: Joi.string().min(2).required(),
         email: Joi.string().email().required(),
-        password: Joi.string().min(6).required()
+        password: Joi.string().min(6).required(),
+        role: Joi.string().valid("user", "admin").optional()
     });
+
+    return schema.validate(data);
+};
+
+const userUpdateValidation = (data) => {
+    const schema = Joi.object({
+        name: Joi.string().min(2).optional(),
+        email: Joi.string().email().optional(),
+        password: Joi.string().min(6).optional(),
+        role: Joi.string().valid("user", "admin").optional()
+    }).min(1);
 
     return schema.validate(data);
 };
@@ -15,6 +27,15 @@ const teamValidation = (data) => {
         name: Joi.string().required(),
         country: Joi.string().required()
     });
+
+    return schema.validate(data);
+};
+
+const teamUpdateValidation = (data) => {
+    const schema = Joi.object({
+        name: Joi.string().optional(),
+        country: Joi.string().optional()
+    }).min(1);
 
     return schema.validate(data);
 };
@@ -30,6 +51,17 @@ const raceValidation = (data) => {
     return schema.validate(data);
 };
 
+const raceUpdateValidation = (data) => {
+    const schema = Joi.object({
+        name: Joi.string().optional(),
+        track: Joi.string().optional(),
+        date: Joi.date().optional(),
+        team: Joi.string().optional()
+    }).min(1);
+
+    return schema.validate(data);
+};
+
 const registrationValidation = (data) => {
     const schema = Joi.object({
         user: Joi.string().required(),
@@ -40,9 +72,23 @@ const registrationValidation = (data) => {
     return schema.validate(data);
 };
 
+const registrationUpdateValidation = (data) => {
+    const schema = Joi.object({
+        user: Joi.string().optional(),
+        race: Joi.string().optional(),
+        position: Joi.number().optional()
+    }).min(1);
+
+    return schema.validate(data);
+};
+
 module.exports = {
     userValidation,
+    userUpdateValidation,
     teamValidation,
+    teamUpdateValidation,
     raceValidation,
-    registrationValidation
+    raceUpdateValidation,
+    registrationValidation,
+    registrationUpdateValidation
 };
