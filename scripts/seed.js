@@ -5,6 +5,7 @@ const bcrypt = require("bcryptjs");
 const User = require("../models/user");
 const Team = require("../models/team");
 const Race = require("../models/race");
+const Registration = require("../models/registration");
 
 const connectDB = require("../config/db");
 
@@ -17,13 +18,14 @@ const seedData = async () => {
         await User.deleteMany();
         await Team.deleteMany();
         await Race.deleteMany();
+        await Registration.deleteMany();
 
         console.log("Seeding users...");
 
         const hashedPassword = await bcrypt.hash("123456", 10);
 
         const users = await User.insertMany([
-            { name: "Admin", email: "admin@test.com", password: hashedPassword },
+            { name: "Admin", email: "admin@test.com", password: hashedPassword, role: "admin" },
             { name: "Lewis Hamilton", email: "lewis@f1.com", password: hashedPassword },
             { name: "Max Verstappen", email: "max@f1.com", password: hashedPassword },
             { name: "Charles Leclerc", email: "charles@f1.com", password: hashedPassword },
@@ -70,12 +72,38 @@ const seedData = async () => {
             });
         }
 
-        await Race.insertMany(races);
+        const createdRaces = await Race.insertMany(races);
+
+        console.log("Seeding registrations...");
+
+        const registrations = await Registration.insertMany([
+            {
+                user: users[1]._id,
+                race: createdRaces[0]._id,
+                position: 1
+            },
+            {
+                user: users[2]._id,
+                race: createdRaces[1]._id,
+                position: 2
+            },
+            {
+                user: users[3]._id,
+                race: createdRaces[2]._id,
+                position: 3
+            },
+            {
+                user: users[4]._id,
+                race: createdRaces[3]._id,
+                position: null
+            }
+        ]);
 
         console.log("Seed completed successfully!");
         console.log(`Users: ${users.length}`);
         console.log(`Teams: ${teams.length}`);
         console.log(`Races: ${races.length}`);
+        console.log(`Registrations: ${registrations.length}`);
 
         process.exit();
 

@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const Registration = require("../models/registration");
+const User = require("../models/user");
+const Race = require("../models/race");
 const authMiddleware = require("../middleware/authMiddleware");
 const mongoose = require("mongoose");
 
@@ -40,10 +42,24 @@ router.post("/", authMiddleware, async (req, res, next) => {
             return res.status(400).json({ message: "Invalid race ID" });
         }
 
+        const userExists = await User.findById(req.body.user);
+        if (!userExists) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        const raceExists = await Race.findById(req.body.race);
+        if (!raceExists) {
+            return res.status(404).json({ message: "Race not found" });
+        }
+
         const registration = new Registration(req.body);
         await registration.save();
 
-        res.status(201).json(registration);
+        const populatedRegistration = await Registration.findById(registration._id)
+            .populate("user", "-password")
+            .populate("race");
+
+        res.status(201).json(populatedRegistration);
 
     } catch (error) {
         next(error);
@@ -90,11 +106,27 @@ router.put("/:id", authMiddleware, async (req, res, next) => {
             return res.status(400).json({ message: "Invalid race ID" });
         }
 
+        if (req.body.user) {
+            const userExists = await User.findById(req.body.user);
+            if (!userExists) {
+                return res.status(404).json({ message: "User not found" });
+            }
+        }
+
+        if (req.body.race) {
+            const raceExists = await Race.findById(req.body.race);
+            if (!raceExists) {
+                return res.status(404).json({ message: "Race not found" });
+            }
+        }
+
         const updatedRegistration = await Registration.findByIdAndUpdate(
             req.params.id,
             req.body,
             { new: true, runValidators: true }
-        );
+        )
+            .populate("user", "-password")
+            .populate("race");
 
         if (!updatedRegistration) {
             return res.status(404).json({ message: "Registration not found" });

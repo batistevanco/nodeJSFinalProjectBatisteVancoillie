@@ -1,201 +1,299 @@
-
 @baseUrl = https://simracing-api.onrender.com
-@token = TOKEN_HERE
-@userId = USER_ID_HERE
-@teamId = TEAM_ID_HERE
-@raceId = RACE_ID_HERE
-@registrationId = REGISTRATION_ID_HERE
 
-### ROOT
+# Vul deze tokens manueel in na de login-requests hieronder
+@adminToken = PASTE_ADMIN_TOKEN_HERE
+@userToken = PASTE_USER_TOKEN_HERE
+
+# Vul deze ids manueel in op basis van responses uit eerdere requests
+@adminUserId = PASTE_ADMIN_USER_ID_HERE
+@normalUserId = PASTE_NORMAL_USER_ID_HERE
+@teamId = PASTE_TEAM_ID_HERE
+@raceId = PASTE_RACE_ID_HERE
+@registrationId = PASTE_REGISTRATION_ID_HERE
+
+###############################################################################
+# SIM RACING LEAGUE API - TESTBESTAND VOOR VERDEDIGING / EVALUATIE
+#
+# AANBEVOLEN VOLGORDE:
+# 1. Run eerst `npm run seed`
+# 2. Test ROOT
+# 3. Login als admin en plak token in @adminToken
+# 4. Login als gewone user en plak token in @userToken
+# 5. Vraag /api/auth/me op voor beide rollen
+# 6. Haal users/teams/races op en vul ids hierboven in
+# 7. Test daarna pas create/update/delete
+#
+# SEEDED ACCOUNTS:
+# - Admin: admin@test.com / 123456
+# - User:  lewis@f1.com / 123456
+#
+# BELANGRIJK:
+# - /api/auth/register maakt enkel gewone users aan
+# - DELETE-requests staan bewust op het einde omdat ze data verwijderen
+###############################################################################
+
+### ---------------------------------------------------------------------------
+### 1. BASISCHECK
+### ---------------------------------------------------------------------------
+
+### ROOT - API bereikbaar
 GET {{baseUrl}}/
 
 ###
 
-### REGISTER
+### ---------------------------------------------------------------------------
+### 2. AUTHENTICATIE
+### ---------------------------------------------------------------------------
+
+### REGISTER - gewone user aanmaken
 POST {{baseUrl}}/api/auth/register
 Content-Type: application/json
 
 {
-  "name": "Batiste",
-  "email": "batiste@email.com",
+  "name": "Demo User",
+  "email": "demouser@email.com",
   "password": "test123"
 }
 
 ###
 
-### LOGIN
+### LOGIN - admin
 POST {{baseUrl}}/api/auth/login
 Content-Type: application/json
 
 {
-  "email": "batiste@email.com",
-  "password": "test123"
+  "email": "admin@test.com",
+  "password": "123456"
 }
 
 ###
 
-### ME
-GET {{baseUrl}}/api/auth/me
-Authorization: Bearer {{token}}
-
-###
-
-### USERS - GET ALL
-GET {{baseUrl}}/api/users
-Authorization: Bearer {{token}}
-
-###
-
-### USERS - GET BY ID
-GET {{baseUrl}}/api/users/{{userId}}
-Authorization: Bearer {{token}}
-
-###
-
-### USERS - CREATE
-POST {{baseUrl}}/api/users
+### LOGIN - gewone user
+POST {{baseUrl}}/api/auth/login
 Content-Type: application/json
-Authorization: Bearer {{token}}
 
 {
-  "name": "Admin User",
-  "email": "admin@test.com",
+  "email": "lewis@f1.com",
+  "password": "123456"
+}
+
+###
+
+### ME - admin token
+GET {{baseUrl}}/api/auth/me
+Authorization: Bearer {{adminToken}}
+
+###
+
+### ME - user token
+GET {{baseUrl}}/api/auth/me
+Authorization: Bearer {{userToken}}
+
+###
+
+### ---------------------------------------------------------------------------
+### 3. USERS
+### ---------------------------------------------------------------------------
+
+### USERS - alle users ophalen - admin only
+GET {{baseUrl}}/api/users
+Authorization: Bearer {{adminToken}}
+
+###
+
+### USERS - admin haalt gewone user op
+GET {{baseUrl}}/api/users/{{normalUserId}}
+Authorization: Bearer {{adminToken}}
+
+###
+
+### USERS - gewone user haalt zichzelf op
+GET {{baseUrl}}/api/users/{{normalUserId}}
+Authorization: Bearer {{userToken}}
+
+###
+
+### USERS - admin maakt extra admin aan
+POST {{baseUrl}}/api/users
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "name": "Extra Admin User",
+  "email": "extraadmin1@test.com",
   "password": "123456",
   "role": "admin"
 }
 
 ###
 
-### USERS - UPDATE
-PUT {{baseUrl}}/api/users/{{userId}}
+### USERS - gewone user update eigen naam
+PUT {{baseUrl}}/api/users/{{normalUserId}}
 Content-Type: application/json
-Authorization: Bearer {{token}}
+Authorization: Bearer {{userToken}}
 
 {
-  "name": "Updated User"
+  "name": "Lewis Updated"
 }
 
 ###
 
-### USERS - DELETE
-DELETE {{baseUrl}}/api/users/{{userId}}
-Authorization: Bearer {{token}}
+### USERS - admin update gewone user
+PUT {{baseUrl}}/api/users/{{normalUserId}}
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "name": "Lewis Admin Updated",
+  "role": "user"
+}
 
 ###
 
-### TEAMS - GET ALL
+### ---------------------------------------------------------------------------
+### 4. TEAMS
+### ---------------------------------------------------------------------------
+
+### TEAMS - alle teams ophalen als admin
 GET {{baseUrl}}/api/teams
-Authorization: Bearer {{token}}
+Authorization: Bearer {{adminToken}}
 
 ###
 
-### TEAMS - GET BY ID
+### TEAMS - alle teams ophalen als gewone user
+GET {{baseUrl}}/api/teams
+Authorization: Bearer {{userToken}}
+
+###
+
+### TEAMS - team ophalen via id
 GET {{baseUrl}}/api/teams/{{teamId}}
-Authorization: Bearer {{token}}
+Authorization: Bearer {{userToken}}
 
 ###
 
-### TEAMS - CREATE
+### TEAMS - admin maakt team aan
 POST {{baseUrl}}/api/teams
 Content-Type: application/json
-Authorization: Bearer {{token}}
+Authorization: Bearer {{adminToken}}
 
 {
-  "name": "Red Bull Racing",
-  "country": "Austria"
+  "name": "Evaluation Team",
+  "country": "Belgium"
 }
 
 ###
 
-### TEAMS - UPDATE
+### TEAMS - admin update team
 PUT {{baseUrl}}/api/teams/{{teamId}}
 Content-Type: application/json
-Authorization: Bearer {{token}}
+Authorization: Bearer {{adminToken}}
 
 {
-  "name": "Updated Team"
+  "name": "Evaluation Team Updated"
 }
 
 ###
 
-### TEAMS - DELETE
-DELETE {{baseUrl}}/api/teams/{{teamId}}
-Authorization: Bearer {{token}}
+### ---------------------------------------------------------------------------
+### 5. RACES
+### ---------------------------------------------------------------------------
 
-###
-
-### RACES - GET ALL
+### RACES - alle races ophalen als admin
 GET {{baseUrl}}/api/races
-Authorization: Bearer {{token}}
+Authorization: Bearer {{adminToken}}
 
 ###
 
-### RACES - GET BY ID
+### RACES - alle races ophalen als gewone user
+GET {{baseUrl}}/api/races
+Authorization: Bearer {{userToken}}
+
+###
+
+### RACES - race ophalen via id
 GET {{baseUrl}}/api/races/{{raceId}}
-Authorization: Bearer {{token}}
+Authorization: Bearer {{userToken}}
 
 ###
 
-### RACES - CREATE
+### RACES - admin maakt race aan
 POST {{baseUrl}}/api/races
 Content-Type: application/json
-Authorization: Bearer {{token}}
+Authorization: Bearer {{adminToken}}
 
 {
-  "name": "Spa GP",
+  "name": "Evaluation Race",
   "track": "Spa-Francorchamps",
-  "date": "2026-04-01",
+  "date": "2026-09-01",
   "team": "{{teamId}}"
 }
 
 ###
 
-### RACES - UPDATE
+### RACES - admin update race
 PUT {{baseUrl}}/api/races/{{raceId}}
 Content-Type: application/json
-Authorization: Bearer {{token}}
+Authorization: Bearer {{adminToken}}
 
 {
-  "name": "Updated Race"
+  "name": "Evaluation Race Updated"
 }
 
 ###
 
-### RACES - DELETE
-DELETE {{baseUrl}}/api/races/{{raceId}}
-Authorization: Bearer {{token}}
+### ---------------------------------------------------------------------------
+### 6. REGISTRATIONS
+### ---------------------------------------------------------------------------
 
-###
-
-### REGISTRATIONS - GET ALL
+### REGISTRATIONS - alle registraties ophalen als admin
 GET {{baseUrl}}/api/registrations
-Authorization: Bearer {{token}}
+Authorization: Bearer {{adminToken}}
 
 ###
 
-### REGISTRATIONS - GET BY ID
+### REGISTRATIONS - alle registraties ophalen als gewone user
+GET {{baseUrl}}/api/registrations
+Authorization: Bearer {{userToken}}
+
+###
+
+### REGISTRATIONS - registratie ophalen via id
 GET {{baseUrl}}/api/registrations/{{registrationId}}
-Authorization: Bearer {{token}}
+Authorization: Bearer {{userToken}}
 
 ###
 
-### REGISTRATIONS - CREATE
+### REGISTRATIONS - admin maakt registratie aan
 POST {{baseUrl}}/api/registrations
 Content-Type: application/json
-Authorization: Bearer {{token}}
+Authorization: Bearer {{adminToken}}
 
 {
-  "user": "{{userId}}",
+  "user": "{{normalUserId}}",
   "race": "{{raceId}}",
   "position": 1
 }
 
 ###
 
-### REGISTRATIONS - UPDATE
+### REGISTRATIONS - gewone user maakt registratie aan
+POST {{baseUrl}}/api/registrations
+Content-Type: application/json
+Authorization: Bearer {{userToken}}
+
+{
+  "user": "{{normalUserId}}",
+  "race": "{{raceId}}",
+  "position": 5
+}
+
+###
+
+### REGISTRATIONS - gewone user update registratie
 PUT {{baseUrl}}/api/registrations/{{registrationId}}
 Content-Type: application/json
-Authorization: Bearer {{token}}
+Authorization: Bearer {{userToken}}
 
 {
   "position": 2
@@ -203,6 +301,28 @@ Authorization: Bearer {{token}}
 
 ###
 
-### REGISTRATIONS - DELETE
+### ---------------------------------------------------------------------------
+### 7. DESTRUCTIEVE TESTS - BEWUST OP HET EINDE
+### ---------------------------------------------------------------------------
+
+### USERS - admin verwijdert gewone user
+DELETE {{baseUrl}}/api/users/{{normalUserId}}
+Authorization: Bearer {{adminToken}}
+
+###
+
+### TEAMS - admin verwijdert team
+DELETE {{baseUrl}}/api/teams/{{teamId}}
+Authorization: Bearer {{adminToken}}
+
+###
+
+### RACES - admin verwijdert race
+DELETE {{baseUrl}}/api/races/{{raceId}}
+Authorization: Bearer {{adminToken}}
+
+###
+
+### REGISTRATIONS - admin verwijdert registratie
 DELETE {{baseUrl}}/api/registrations/{{registrationId}}
-Authorization: Bearer {{token}}
+Authorization: Bearer {{adminToken}}
