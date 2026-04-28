@@ -29,6 +29,8 @@
 #
 # BELANGRIJK:
 # - /api/auth/register maakt enkel gewone users aan
+# - gewone users mogen enkel hun eigen registraties beheren
+# - admins mogen registraties voor alle users beheren
 # - DELETE-requests staan bewust op het einde omdat ze data verwijderen
 ###############################################################################
 
@@ -277,7 +279,7 @@ Authorization: Bearer {{adminToken}}
 
 ###
 
-### REGISTRATIONS - gewone user maakt registratie aan
+### REGISTRATIONS - gewone user maakt eigen registratie aan
 POST {{baseUrl}}/api/registrations
 Content-Type: application/json
 Authorization: Bearer {{userToken}}
@@ -286,6 +288,19 @@ Authorization: Bearer {{userToken}}
   "user": "{{normalUserId}}",
   "race": "{{raceId}}",
   "position": 5
+}
+
+###
+
+### REGISTRATIONS - gewone user mag geen registratie voor admin maken
+POST {{baseUrl}}/api/registrations
+Content-Type: application/json
+Authorization: Bearer {{userToken}}
+
+{
+  "user": "{{adminUserId}}",
+  "race": "{{raceId}}",
+  "position": 8
 }
 
 ###
@@ -305,6 +320,12 @@ Authorization: Bearer {{userToken}}
 ### 7. DESTRUCTIEVE TESTS - BEWUST OP HET EINDE
 ### ---------------------------------------------------------------------------
 
+### REGISTRATIONS - admin verwijdert registratie
+DELETE {{baseUrl}}/api/registrations/{{registrationId}}
+Authorization: Bearer {{adminToken}}
+
+###
+
 ### USERS - admin verwijdert gewone user
 DELETE {{baseUrl}}/api/users/{{normalUserId}}
 Authorization: Bearer {{adminToken}}
@@ -319,10 +340,4 @@ Authorization: Bearer {{adminToken}}
 
 ### RACES - admin verwijdert race
 DELETE {{baseUrl}}/api/races/{{raceId}}
-Authorization: Bearer {{adminToken}}
-
-###
-
-### REGISTRATIONS - admin verwijdert registratie
-DELETE {{baseUrl}}/api/registrations/{{registrationId}}
 Authorization: Bearer {{adminToken}}

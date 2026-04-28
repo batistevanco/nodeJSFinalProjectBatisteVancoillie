@@ -11,10 +11,20 @@ const {
     registrationUpdateValidation
 } = require("../validation/generalValidation");
 
+const canAccessRegistration = (req, registration) => {
+    const registrationUserId = registration.user._id
+        ? registration.user._id.toString()
+        : registration.user.toString();
+
+    return req.user.role === "admin" || registrationUserId === req.user.id;
+};
+
 // alle registraties ophalen
 router.get("/", authMiddleware, async (req, res, next) => {
     try {
-        const registrations = await Registration.find()
+        const filter = req.user.role === "admin" ? {} : { user: req.user.id };
+
+        const registrations = await Registration.find(filter)
             .populate("user", "-password")
             .populate("race");
 
@@ -36,6 +46,10 @@ router.post("/", authMiddleware, async (req, res, next) => {
         // ObjectId checks
         if (!mongoose.Types.ObjectId.isValid(req.body.user)) {
             return res.status(400).json({ message: "Invalid user ID" });
+        }
+
+        if (req.user.role !== "admin" && req.body.user !== req.user.id) {
+            return res.status(403).json({ message: "Access denied" });
         }
 
         if (!mongoose.Types.ObjectId.isValid(req.body.race)) {
@@ -80,6 +94,10 @@ router.get("/:id", authMiddleware, async (req, res, next) => {
             return res.status(404).json({ message: "Registration not found" });
         }
 
+        if (!canAccessRegistration(req, registration)) {
+            return res.status(403).json({ message: "Access denied" });
+        }
+
         res.json(registration);
 
     } catch (error) {
@@ -98,8 +116,21 @@ router.put("/:id", authMiddleware, async (req, res, next) => {
             return res.status(400).json({ message: error.details[0].message });
         }
 
+        const registration = await Registration.findById(req.params.id);
+        if (!registration) {
+            return res.status(404).json({ message: "Registration not found" });
+        }
+
+        if (!canAccessRegistration(req, registration)) {
+            return res.status(403).json({ message: "Access denied" });
+        }
+
         if (req.body.user && !mongoose.Types.ObjectId.isValid(req.body.user)) {
             return res.status(400).json({ message: "Invalid user ID" });
+        }
+
+        if (req.user.role !== "admin" && req.body.user && req.body.user !== req.user.id) {
+            return res.status(403).json({ message: "Access denied" });
         }
 
         if (req.body.race && !mongoose.Types.ObjectId.isValid(req.body.race)) {
@@ -123,14 +154,10 @@ router.put("/:id", authMiddleware, async (req, res, next) => {
         const updatedRegistration = await Registration.findByIdAndUpdate(
             req.params.id,
             req.body,
-            { new: true, runValidators: true }
+            { returnDocument: "after", runValidators: true }
         )
             .populate("user", "-password")
             .populate("race");
-
-        if (!updatedRegistration) {
-            return res.status(404).json({ message: "Registration not found" });
-        }
 
         res.json(updatedRegistration);
 
@@ -145,11 +172,16 @@ router.delete("/:id", authMiddleware, async (req, res, next) => {
             return res.status(400).json({ message: "Invalid registration ID" });
         }
 
-        const deletedRegistration = await Registration.findByIdAndDelete(req.params.id);
-
-        if (!deletedRegistration) {
+        const registration = await Registration.findById(req.params.id);
+        if (!registration) {
             return res.status(404).json({ message: "Registration not found" });
         }
+
+        if (!canAccessRegistration(req, registration)) {
+            return res.status(403).json({ message: "Access denied" });
+        }
+
+        await Registration.findByIdAndDelete(req.params.id);
 
         res.json({ message: "Registration deleted" });
 

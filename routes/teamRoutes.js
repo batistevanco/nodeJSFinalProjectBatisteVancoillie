@@ -75,7 +75,7 @@ router.put("/:id", authMiddleware, adminMiddleware, async (req, res, next) => {
         const updatedTeam = await Team.findByIdAndUpdate(
             req.params.id,
             req.body,
-            { new: true, runValidators: true }
+            { returnDocument: "after", runValidators: true }
         );
 
         if (!updatedTeam) {

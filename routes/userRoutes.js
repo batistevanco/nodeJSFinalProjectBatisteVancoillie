@@ -120,7 +120,7 @@ router.put("/:id", authMiddleware, async (req, res, next) => {
         const updatedUser = await User.findByIdAndUpdate(
             req.params.id,
             updates,
-            { new: true, runValidators: true }
+            { returnDocument: "after", runValidators: true }
         ).select("-password");
 
         if (!updatedUser) {

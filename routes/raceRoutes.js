@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Race = require("../models/race");
+const Team = require("../models/team");
 const authMiddleware = require("../middleware/authMiddleware");
 const adminMiddleware = require("../middleware/adminMiddleware");
 const mongoose = require("mongoose");
@@ -50,6 +51,11 @@ router.post("/", authMiddleware, adminMiddleware, async (req, res, next) => {
             return res.status(400).json({ message: "Invalid team ID" });
         }
 
+        const teamExists = await Team.findById(req.body.team);
+        if (!teamExists) {
+            return res.status(404).json({ message: "Team not found" });
+        }
+
         const race = new Race(req.body);
 
         await race.save();
@@ -76,10 +82,17 @@ router.put("/:id", authMiddleware, adminMiddleware, async (req, res, next) => {
             return res.status(400).json({ message: "Invalid team ID" });
         }
 
+        if (req.body.team) {
+            const teamExists = await Team.findById(req.body.team);
+            if (!teamExists) {
+                return res.status(404).json({ message: "Team not found" });
+            }
+        }
+
         const updatedRace = await Race.findByIdAndUpdate(
             req.params.id,
             req.body,
-            { new: true, runValidators: true }
+            { returnDocument: "after", runValidators: true }
         );
 
         if (!updatedRace) {
