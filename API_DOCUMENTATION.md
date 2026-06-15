@@ -11,7 +11,7 @@ http://localhost:3000
 Live:
 
 ```text
-https://simracing-api.onrender.com
+https://nodeproject.batistevancoillie.be/
 ```
 
 ## Authenticatie

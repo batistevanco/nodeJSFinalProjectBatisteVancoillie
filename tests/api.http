@@ -1,4 +1,4 @@
-@baseUrl = https://simracing-api.onrender.com
+@baseUrl = https://nodeproject.batistevancoillie.be
 
 # Vul deze tokens manueel in na de login-requests hieronder
 @adminToken = PASTE_ADMIN_TOKEN_HERE

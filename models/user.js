@@ -28,6 +28,7 @@ const userSchema = new mongoose.Schema({
         enum: ["user", "admin"],
         default: "user"
     },
+    
 
     // Datum waarop de gebruiker werd aangemaakt
     createdAt: {
